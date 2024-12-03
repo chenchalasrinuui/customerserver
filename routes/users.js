@@ -3,6 +3,7 @@ var router = express.Router();
 var getDB = require('../common/dbCon')
 var jwt = require('jsonwebtoken')
 var verifyToken = require('../common/verifyToken')
+
 router.post('/register', async function (req, res, next) {
   try {
     const data = req.body.data;
@@ -27,10 +28,10 @@ router.post('/register', async function (req, res, next) {
 
 router.post('/login', async function (req, res, next) {
   try {
-    const data = req.body.data;
+    const user = req.body.user;
     const db = await getDB()
     const collection = db.collection('customers')
-    const result = await collection.find(data).toArray()
+    const result = await collection.find({ $or: [{ email: user }, { phone: user }] }).toArray()
     res.send(result)
   } catch (ex) {
     res.send({ msg: ex.message })
