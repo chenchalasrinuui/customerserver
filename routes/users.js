@@ -42,7 +42,7 @@ router.post('/get-token', async function (req, res, next) {
   try {
     const data = req.body.data;
     const token = jwt.sign(data, "appToken")
-    res.send(token)
+    res.send({ ...data, token })
   } catch (ex) {
     res.send({ msg: ex.message })
   }
@@ -78,6 +78,41 @@ router.get(
     }
   }
 )
+
+router.post('/add-to-cart', async function (req, res, next) {
+  const { uid, product } = req.body;
+  const db = await getDB();
+  const collection = db.collection('cart');
+
+  const result = await collection.updateOne(
+    { uid: uid }, // Filter by uid
+    {
+      $set: { uid: uid }, // Ensure 'uid' is set
+      $push: { products: product } // Push new product into 'products' array
+    },
+    { upsert: true } // Create document if it doesn't exist
+  );
+
+  res.send(result);
+
+})
+
+router.post('/delete-from-cart', async function (req, res, next) {
+  const { uid, productId } = req.body;
+  const db = await getDB();
+  const collection = db.collection('cart');
+
+  const result = await collection.updateOne(
+    { uid: uid }, // Filter by uid
+    {
+      $pull: { products: { productId } } // Remove product with matching name
+    }
+  );
+  res.send(result);
+
+})
+
+
 
 
 module.exports = router;
