@@ -68,10 +68,10 @@ router.get(
   verifyToken,
   async function (req, res, next) {
     try {
-      const data = req.body.data;
+      const uid = req.query.uid;
       const db = await getDB()
       const collection = db.collection("cart")
-      const result = await collection.find(data).toArray()
+      const result = await collection.find({ uid }).toArray()
       res.send(result)
     } catch (ex) {
       res.send({ msg: ex.message })
@@ -105,7 +105,7 @@ router.post('/delete-from-cart', async function (req, res, next) {
   const result = await collection.updateOne(
     { uid: uid }, // Filter by uid
     {
-      $pull: { products: { productId } } // Remove product with matching name
+      $pull: { products: { _id: productId } } // Remove product with matching name
     }
   );
   res.send(result);
