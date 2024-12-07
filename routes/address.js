@@ -17,9 +17,10 @@ router.post('/save', verifyToken, async function (req, res, next) {
 });
 router.get('/get', verifyToken, async function (req, res, next) {
     try {
+        const uid = req.query.uid
         const db = await getDB()
         var collection = db.collection('address')
-        var result = await collection.find({}).toArray();
+        var result = await collection.find({ uid }).toArray();
         res.send(result);
     } catch (ex) {
         res.status(500).json({ msg: ex.message })
@@ -42,7 +43,7 @@ router.put('/update/:id', verifyToken, async function (req, res, next) {
         var id = req.params.id
         const db = await getDB()
         var collection = db.collection('address')
-        var result = await collection.updateOne({ _id: objectId.createFromHexString(id), $set: data });
+        var result = await collection.updateOne({ _id: objectId.createFromHexString(id) }, { $set: data });
         res.send(result);
     } catch (ex) {
         res.status(500).json({ msg: ex.message })
